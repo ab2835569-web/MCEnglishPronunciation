@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MC ইংরেজি উচ্চারণ প্রশিক্ষণকারী</title>
+    
+    <!-- Plausible Analytics -->
+    <script async defer data-domain="mc-english-pronunciation.vercel.app" src="https://plausible.io/js/plausible.js"></script>
+    
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f6fa; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { width: 90%; max-width: 600px; background: #fff; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); padding: 20px; text-align: center; transition: opacity 0.3s; }
+        h1, h2 { color: #333; }
+        p { color: #555; line-height: 1.5; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 10px; margin: 5px; font-size: 16px; cursor: pointer; width: 100%; max-width: 200px; transition: background 0.3s; }
+        button:hover { background: #0056b3; }
+        .hidden { display: none; }
+        .sentence-container { display: flex; align-items: center; justify-content: center; margin: 10px 0; flex-wrap: wrap; }
+        .sentence { font-size: 22px; font-weight: bold; margin-right: 10px; }
+        .meaning { font-size: 18px; color: #555; margin-bottom: 10px; }
+        .icons { margin: 10px 0; display: flex; justify-content: center; align-items: center; }
+        .icons span { font-size: 28px; cursor: pointer; margin: 0 20px; transition: transform 0.2s; }
+        .icons span:hover { transform: scale(1.2); }
+        .correct { color: green; }
+        .wrong { color: red; text-decoration: underline wavy; }
+        .notification { position: fixed; top: 20px; right: 20px; background: #fff; padding: 10px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; display: none; animation: fadeInOut 0.3s; }
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+        .history { text-align: left; background: #f0f0f0; padding: 10px; margin-top: 10px; border-radius: 8px; max-height: 200px; overflow-y: auto; position: relative; }
+        .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .clear-history { cursor: pointer; color: red; font-size: 18px; padding: 5px; }
+        .progress { margin: 10px 0; font-weight: bold; }
+        .glow { animation: glow 1s infinite alternate; }
+        .recording { animation: recordingGlow 1s infinite alternate; }
+        .userSpoken { margin-top: 10px; font-style: italic; color: #444; }
+        .quick-guide { background: #e7f3ff; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #007bff; }
+        .step { display: flex; align-items: center; margin: 10px 0; text-align: left; }
+        .step-number { background: #007bff; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; font-weight: bold; }
+        @keyframes glow { 0% { text-shadow: 0 0 5px #007bff; } 100% { text-shadow: 0 0 20px #007bff; } }
+        @keyframes recordingGlow { 0% { text-shadow: 0 0 5px #ff0000; } 100% { text-shadow: 0 0 20px #ff0000; } }
+        @media (max-width: 480px) { .container { padding: 15px; } button { font-size: 14px; padding: 8px 16px; margin: 5px 0; width: 90%; } .icons span { font-size: 24px; margin: 0 10px; } .sentence { font-size: 18px; } .meaning { font-size: 16px; } .notification { right: 10px; left: 10px; top: 10px; } .history { max-height: 150px; font-size: 14px; } }
+    </style>
+</head>
+<body>
+
+<!-- Quick Guide Page -->
+<div class="container" id="guidePage">
+    <h1>🚀 শুরু করার গাইড</h1>
+    
+    <div class="quick-guide">
+        <h3>📝 দ্রুত শুরু করুন (৩টি সহজ ধাপ)</h3>
+        
+        <div class="step">
+            <div class="step-number">1</div>
+            <div>
+                <strong>ইংরেজি বাক্য শুনুন</strong><br>
+                <span style="color: #666;">🔊 বাটনে ক্লিক করে সঠিক উচ্চারণ শুনুন</span>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">2</div>
+            <div>
+                <strong>আপনার উচ্চারণ রেকর্ড করুন</strong><br>
+                <span style="color: #666;">🎤 বাটনে ক্লিক করে ইংরেজি বাক্য বলুন</span>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">3</div>
+            <div>
+                <strong>ফিডব্যাক পান ও শিখুন</strong><br>
+                <span style="color: #666;">✅ সঠিক শব্দ সবুজ, ❌ ভুল শব্দ লাল দেখাবে</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: left; background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ffc107;">
+        <h4>💡 গুরুত্বপূর্ণ টিপস:</h4>
+        <ul style="text-align: left; color: #666;">
+            <li><strong>Chrome ব্রাউজার</strong> ব্যবহার করুন (সবচেয়ে ভালো কাজ করে)</li>
+            <li><strong>মাইক্রোফোন অন</strong> রাখুন</li>
+            <li><strong>শান্ত জায়গায়</strong> প্র্যাকটিস করুন</li>
+            <li><strong>ধীরে ধীরে</strong> ও <strong>পরিষ্কারভাবে</strong> বলুন</li>
+        </ul>
+    </div>
+
+    <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+        <button id="startLearning" style="background: #28a745;">📚 এখনই শেখা শুরু করুন</button>
+        <button id="seeDetails" style="background: #6c757d;">ℹ️ বিস্তারিত জানুন</button>
+    </div>
+</div>
+
+<!-- Intro Page -->
+<div class="container hidden" id="introPage">
+    <h1>MC ইংরেজি উচ্চারণ প্রশিক্ষণকারী</h1>
+    <p>🎯 <b>এই ওয়েব অ্যাপটি কেন তৈরি করা হয়েছে?</b><br>
+    বাংলাভাষী শিক্ষার্থীদের জন্য ইংরেজি উচ্চারণ সহজভাবে শেখার উদ্দেশ্যে এই অ্যাপটি তৈরি করা হয়েছে। অনেকেই ইংরেজি শব্দ পড়তে পারে কিন্তু সঠিক উচ্চারণ করতে সমস্যা হয়। এই অ্যাপটি তোমাকে সেই সমস্যা দূর করতে সাহায্য করবে।</p>
+
+    <p>📚 <b>কী শিখতে পারবে?</b><br>
+    - সহজ গ্রিটিংস থেকে শুরু করে জটিল ইংরেজি প্রবাদ<br>
+    - সঠিক উচ্চারণের টেকনিক<br>
+    - আত্মবিশ্বাসের সাথে ইংরেজি বলার ক্ষমতা<br>
+    - দৈনন্দিন জীবনে ব্যবহৃত গুরুত্বপূর্ণ বাক্য</p>
+
+    <p>🌟 <b>বিশেষ সুবিধা:</b><br>
+    - গেমের মতো আনলক সিস্টেম<br>
+    - ইনস্ট্যান্ট ফিডব্যাক<br>
+    - বাংলা অর্থসহ ইংরেজি বাক্য<br>
+    - অটো প্রোগ্রেস সেভ</p>
+
+    <button id="next1">ব্যবহার বিধি জানুন ➜</button>
+</div>
+
+<!-- HowTo Page -->
+<div class="container hidden" id="howToPage">
+    <h2>ব্যবহার বিধি</h2>
+    <p>1️⃣ প্রথমে '🎤' বাটনে ক্লিক করে বাক্যটি উচ্চারণ করো।<br>
+       2️⃣ সঠিক শব্দ সবুজে দেখাবে, ভুল লাল আন্ডারলাইনে।<br>
+       3️⃣ ৩ বার সঠিক উচ্চারণ করলে পরবর্তী সিজন আনলক হবে।<br>
+       4️⃣ ইতিহাস বক্সে তোমার সাম্প্রতিক ভুল দেখাবে।<br>
+       5️⃣ রিস্টার্ট বাটন দিয়ে পুরো সিজন আবার চেষ্টা করতে পারবে।</p>
+    <button id="next2">শুরু করো ➜</button>
+</div>
+
+<!-- Main Page -->
+<div class="container hidden" id="mainPage">
+    <h2 id="engText">Sentence Here</h2>
+    <p class="meaning" id="bnText">বাংলা অর্থ এখানে</p>
+
+    <div class="icons">
+        <span id="listenBtn" title="শুনুন 🔊">🔊</span>
+        <span id="speakBtn" title="উচ্চারণ বলুন 🎤">🎤</span>
+        <span id="tryBtn" title="ফের চেষ্টা করুন 🔁">🔁</span>
+        <span id="nextBtn" title="পরবর্তী বাক্য ➡️">➡️</span>
+        <span id="restartSeasonBtn" title="সিজন রিস্টার্ট 🔄">🔄</span>
+    </div>
+
+    <div class="progress" id="progress">সিজন 1/21 - ধাপ 1/5 | সঠিক: 0/5</div>
+    <div class="userSpoken" id="userSpokenText"></div>
+    <div class="notification" id="note"></div>
+
+    <!-- Quick Help Section -->
+    <div style="background: #e7f3ff; padding: 10px; border-radius: 8px; margin: 10px 0; text-align: left;">
+        <details>
+            <summary><strong>❓ কীভাবে ব্যবহার করবেন?</strong></summary>
+            <ol style="text-align: left; margin: 10px 0; padding-left: 20px;">
+                <li><strong>🔊 শুনুন</strong> - সঠিক উচ্চারণ শুনুন</li>
+                <li><strong>🎤 বলুন</strong> - মাইক্রোফোন চালু করে বলুন</li>
+                <li><strong>✅ ফলাফল দেখুন</strong> - সবুজ = সঠিক, লাল = ভুল</li>
+                <li><strong>➡️ পরবর্তী</strong> - নতুন বাক্যে যান</li>
+            </ol>
+        </details>
+    </div>
+
+    <div class="history" id="historyBox"></div>
+</div><script>
+    // 21 Seasons, 5 sentences each = 105 sentences
+    const seasons = [
+        [{en:"Hello",bn:"হ্যালো"},{en:"Good morning",bn:"সুপ্রভাত"},{en:"How are you?",bn:"আপনি কেমন আছেন?"},{en:"Thank you",bn:"ধন্যবাদ"},{en:"Goodbye",bn:"বিদায়"}],
+        [{en:"Good evening",bn:"শুভ সন্ধ্যা"},{en:"Nice to meet you",bn:"আপনার সাথে দেখা হয়ে ভালো লাগলো"},{en:"What is your name?",bn:"আপনার নাম কী?"},{en:"Please",bn:"দয়া করে"},{en:"Sorry",bn:"দুঃখিত"}],
+        [{en:"See you later",bn:"পরে দেখা হবে"},{en:"Have a good day",bn:"ভালো দিন কাটান"},{en:"Welcome",bn:"স্বাগতম"},{en:"Excuse me",bn:"অজুহাত দিন"},{en:"Yes",bn:"হ্যাঁ"}],
+        [{en:"No",bn:"না"},{en:"I am fine",bn:"আমি ভালো আছি"},{en:"And you?",bn:"আর আপনি?"},{en:"Good night",bn:"শুভ রাত্রি"},{en:"Take care",bn:"যত্ন নিন"}],
+        [{en:"How old are you?",bn:"আপনার বয়স কত?"},{en:"Where are you from?",bn:"আপনি কোথা থেকে?"},{en:"I love you",bn:"আমি আপনাকে ভালোবাসি"},{en:"Happy birthday",bn:"জন্মদিন মঙ্গলময় হোক"},{en:"Congratulations",bn:"অভিনন্দন"}],
+        [{en:"Sit down",bn:"বসুন"},{en:"Stand up",bn:"উঠুন"},{en:"Open the door",bn:"দরজা খুলুন"},{en:"Close the window",bn:"জানালা বন্ধ করুন"},{en:"Eat your food",bn:"আপনার খাবার খান"}],
+        [{en:"Drink water",bn:"পানি পান করুন"},{en:"Read the book",bn:"বইটি পড়ুন"},{en:"Write a letter",bn:"একটা চিঠি লিখুন"},{en:"Run fast",bn:"দ্রুত দৌড়ান"},{en:"Walk slowly",bn:"ধীরে চলুন"}],
+        [{en:"Turn left",bn:"বামে ঘুরুন"},{en:"Go straight",bn:"সোজা যান"},{en:"Stop here",bn:"এখানে থামুন"},{en:"Help me",bn:"আমাকে সাহায্য করুন"},{en:"Call now",bn:"এখন কল করুন"}],
+        [{en:"Wash your hands",bn:"হাত ধুয়ে নিন"},{en:"Brush your teeth",bn:"দাঁত ব্রাশ করুন"},{en:"Sleep early",bn:"আগে ঘুমান"},{en:"Wake up",bn:"জাগুন"},{en:"Study hard",bn:"কঠোর পড়াশোনা করুন"}],
+        [{en:"Play outside",bn:"বাইরে খেলুন"},{en:"Share with friends",bn:"বন্ধুদের সাথে শেয়ার করুন"},{en:"Be quiet",bn:"শান্ত থাকুন"},{en:"Laugh loudly",bn:"জোরে হাসুন"},{en:"Sing a song",bn:"একটা গান গান করুন"}],
+        [{en:"I am hungry",bn:"আমার ক্ষুধা পেয়েছে"},{en:"This is good",bn:"এটা ভালো"},{en:"That is bad",bn:"ওটা খারাপ"},{en:"I don't know",bn:"আমি জানি না"},{en:"I understand",bn:"আমি বুঝেছি"}],
+        [{en:"I don't understand",bn:"আমি বুঝতে পারছি না"},{en:"Can you help me?",bn:"আপনি কি আমাকে সাহায্য করতে পারবেন?"},{en:"Where is the toilet?",bn:"টয়লেটটি কোথায়?"},{en:"How much is this?",bn:"এটার দাম কত?"},{en:"I want this",bn:"আমি এটা চাই"}],
+        [{en:"I like it",bn:"আমি এটা পছন্দ করি"},{en:"I don't like it",bn:"আমি এটা পছন্দ করি না"},{en:"It's okay",bn:"ঠিক আছে"},{en:"No problem",bn:"কোন সমস্যা নেই"},{en:"Of course",bn:"অবশ্যই"}],
+        [{en:"Maybe",bn:"হতে পারে"},{en:"Never mind",bn:"কিছু মনে করো না"},{en:"Hurry up",bn:"তারাতারি করো"},{en:"Wait a minute",bn:"এক মিনিট অপেক্ষা করো"},{en:"Let's go",bn:"চলো যাই"}],
+        [{en:"Come here",bn:"এখানে আসো"},{en:"Go there",bn:"সেখানে যাও"},{en:"Look at this",bn:"এটা দেখো"},{en:"Listen to me",bn:"আমার কথা শুনো"},{en:"Be careful",bn:"সতর্ক থাকো"}],
+        [{en:"Good job",bn:"ভালো কাজ"},{en:"Well done",bn:"অভিনন্দন"},{en:"You can do it",bn:"তুমি পারবে"},{en:"Don't worry",bn:"চিন্তা করো না"},{en:"Believe in yourself",bn:"নিজের উপর বিশ্বাস রাখো"}],
+        [{en:"Practice makes perfect",bn:"অনুশীলনই সাফল্যের চাবিকাঠি"},{en:"Never give up",bn:"কখনো হাল ছেড়ো না"},{en:"Keep trying",bn:"চেষ্টা চালিয়ে যাও"},{en:"You are learning",bn:"তুমি শিখছো"},{en:"Mistakes are okay",bn:"ভুল করা স্বাভাবিক"}],
+        [{en:"The sky is blue",bn:"আকাশ নীল"},{en:"The sun is bright",bn:"সূর্য উজ্জ্বল"},{en:"It is raining",bn:"বৃষ্টি fallingছে"},{en:"I feel happy",bn:"আমি খুশি বোধ করছি"},{en:"Today is beautiful",bn:"আজকের দিনটি সুন্দর"}],
+        [{en:"Time is valuable",bn:"সময় মূল্যবান"},{en:"Health is wealth",bn:"স্বাস্থ্যই সম্পদ"},{en:"Knowledge is power",bn:"জ্ঞানই শক্তি"},{en:"Love is eternal",bn:"ভালোবাসা চিরন্তন"},{en:"Life is beautiful",bn:"জীবন সুন্দর"}],
+        [{en:"Actions speak louder than words",bn:"কথার চেয়ে কাজ বেশি জোরালো"},{en:"Where there is a will there is a way",bn:"ইচ্ছা থাকলে উপায় হয়"},{en:"Better late than never",bn:"কখনো না করার চেয়ে দেরিতে করা ভালো"},{en:"Honesty is the best policy",bn:"সততাই সর্বোত্তম পন্থা"},{en:"Practice what you preach",bn:"যা প্রচার করো তা নিজে অনুশীলন করো"}]
+    ];
+
+    // State
+    let currentSeason = 0;
+    let currentStep = 0;
+    let correctInSeries = 0;
+    let sentenceCorrectStatus = [false, false, false, false, false];
+    let history = [];
+    const totalSeasons = seasons.length;
+    let recognizing = false;
+
+    // DOM
+    const guidePage = document.getElementById("guidePage");
+    const introPage = document.getElementById("introPage");
+    const howToPage = document.getElementById("howToPage");
+    const mainPage = document.getElementById("mainPage");
+    const engText = document.getElementById("engText");
+    const bnText = document.getElementById("bnText");
+    const listenBtn = document.getElementById("listenBtn");
+    const speakBtn = document.getElementById("speakBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const tryBtn = document.getElementById("tryBtn");
+    const restartBtn = document.getElementById("restartSeasonBtn");
+    const note = document.getElementById("note");
+    const historyBox = document.getElementById("historyBox");
+    const progressBox = document.getElementById("progress");
+    const userSpokenText = document.getElementById("userSpokenText");
+
+    // New Navigation for Guide
+    document.getElementById("startLearning").addEventListener("click", () => {
+        guidePage.classList.add("hidden");
+        mainPage.classList.remove("hidden");
+        loadState();
+        loadSentence();
+    });
+
+    document.getElementById("seeDetails").addEventListener("click", () => {
+        guidePage.classList.add("hidden");
+        introPage.classList.remove("hidden");
+    });
+
+    // Rest of the navigation
+    document.getElementById("next1").addEventListener("click", () => {
+        introPage.classList.add("hidden");
+        howToPage.classList.remove("hidden");
+    });
+
+    document.getElementById("next2").addEventListener("click", () => {
+        howToPage.classList.add("hidden");
+        mainPage.classList.remove("hidden");
+        loadState();
+        loadSentence();
+    });
+
+    // Load saved state
+    function loadState() {
+        currentSeason = parseInt(localStorage.getItem('currentSeason')) || 0;
+        correctInSeries = parseInt(localStorage.getItem(`correctInSeason${currentSeason}`)) || 0;
+        const savedStatus = localStorage.getItem(`statusSeason${currentSeason}`);
+        sentenceCorrectStatus = savedStatus ? JSON.parse(savedStatus) : [false, false, false, false, false];
+        
+        const savedHistory = localStorage.getItem("history");
+        history = savedHistory ? JSON.parse(savedHistory) : [];
+    }
+
+    // Levenshtein Distance
+    function levenshteinDistance(a, b) {
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                if (b[i - 1] === a[j - 1]) matrix[i][j] = matrix[i - 1][j - 1];
+                else matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j] + 1);
+            }
+        }
+        return matrix[b.length][a.length];
+    }
+
+    // Load Sentence
+    function loadSentence() {
+        let used = JSON.parse(localStorage.getItem(`usedSeason${currentSeason}`)) || [];
+        let randIndex = Math.floor(Math.random() * 5);
+        while (used.includes(randIndex) && used.length < 5) randIndex = Math.floor(Math.random() * 5);
+        if (!used.includes(randIndex)) {
+            used.push(randIndex);
+            localStorage.setItem(`usedSeason${currentSeason}`, JSON.stringify(used));
+        }
+        currentStep = randIndex;
+        const s = seasons[currentSeason][currentStep];
+        engText.innerHTML = s.en;
+        bnText.innerText = s.bn;
+        userSpokenText.innerText = "";
+        note.style.display = "none";
+        displayProgress();
+        displayHistory();
+        localStorage.setItem('currentStep', currentStep);
+    }
+
+    // Display Progress
+    function displayProgress() {
+        progressBox.innerText = `সিজন ${currentSeason + 1}/${totalSeasons} - ধাপ ${currentStep + 1}/5 | সঠিক: ${correctInSeries}/5`;
+    }
+
+    // Show notification
+    function showNote(message, duration, color) {
+        note.innerText = message;
+        note.style.color = color || "black";
+        note.style.display = "block";
+        setTimeout(() => {
+            note.style.display = "none";
+        }, duration);
+    }    // TTS
+    listenBtn.addEventListener("click", () => {
+        if (!('speechSynthesis' in window)) {
+            showNote("TTS সাপোর্ট করা হয়নি! Chrome ব্যবহার করো।", 2000, "red");
+            return;
+        }
+        const utter = new SpeechSynthesisUtterance(seasons[currentSeason][currentStep].en);
+        utter.lang = 'en-US';
+        speechSynthesis.speak(utter);
+    });
+
+    // STT
+    speakBtn.addEventListener("click", () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            showNote("Speech recognition সাপোর্ট করা হয়নি! Chrome ব্যবহার করো।", 3000, "red");
+            return;
+        }
+        if (recognizing) return;
+        
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        
+        recognizing = true;
+        speakBtn.classList.add("recording");
+        speakBtn.innerHTML = "🎤🔴";
+        showNote("উচ্চারণ বলো... (শান্ত জায়গায় বলো)", 3000, "blue");
+        
+        recognition.start();
+        
+        recognition.onresult = (event) => {
+            recognizing = false;
+            speakBtn.classList.remove("recording");
+            speakBtn.innerHTML = "🎤";
+            const transcript = event.results[0][0].transcript.trim();
+            userSpokenText.innerText = `তুমি বলেছো: ${transcript}`;
+            checkPronunciation(transcript);
+        };
+        
+        recognition.onerror = () => {
+            recognizing = false;
+            speakBtn.classList.remove("recording");
+            speakBtn.innerHTML = "🎤";
+            showNote("STT ত্রুটি: মাইক চেক করো বা শান্ত জায়গায় চেষ্টা করো!", 3000, "red");
+        };
+        
+        recognition.onend = () => {
+            recognizing = false;
+            speakBtn.classList.remove("recording");
+            speakBtn.innerHTML = "🎤";
+        };
+    });
+
+    // Check Pronunciation
+    function checkPronunciation(transcript) {
+        const original = seasons[currentSeason][currentStep].en.toLowerCase().replace(/[^\w\s]/g, "");
+        const spokenWords = transcript.toLowerCase().replace(/[^\w\s]/g, "").split(" ");
+        const origWords = original.split(" ");
+        let feedback = [];
+        let correctCount = 0;
+        let historyAdds = [];
+        
+        origWords.forEach((w, i) => {
+            const userWord = spokenWords[i] || "";
+            const distance = levenshteinDistance(userWord, w);
+            const similarity = 1 - (distance / Math.max(userWord.length, w.length || 1));
+            
+            if (similarity >= 0.8) {
+                feedback.push(`<span class="correct">${origWords[i]}</span>`);
+                correctCount++;
+            } else {
+                feedback.push(`<span class="wrong">${origWords[i]}</span>`);
+                historyAdds.push({ wrong: userWord || "(নেই)", right: origWords[i] });
+            }
+        });
+        
+        engText.innerHTML = feedback.join(" ");
+        historyAdds.forEach(h => history.push(h));
+        if (history.length > 5) history = history.slice(-5);
+        localStorage.setItem("history", JSON.stringify(history));
+        displayHistory();
+        
+        if (correctCount === origWords.length) {
+            if (!sentenceCorrectStatus[currentStep]) {
+                sentenceCorrectStatus[currentStep] = true;
+                correctInSeries++;
+                localStorage.setItem(`correctInSeason${currentSeason}`, correctInSeries);
+                localStorage.setItem(`statusSeason${currentSeason}`, JSON.stringify(sentenceCorrectStatus));
+                showNote("🎉 সঠিক উচ্চারণ! +1 পয়েন্ট", 2000, "green");
+                
+                if (correctInSeries >= 3) {
+                    if (currentSeason < totalSeasons - 1) {
+                        currentSeason++;
+                        localStorage.setItem('currentSeason', currentSeason);
+                        correctInSeries = 0;
+                        sentenceCorrectStatus = [false, false, false, false, false];
+                        localStorage.setItem(`correctInSeason${currentSeason}`, 0);
+                        localStorage.setItem(`statusSeason${currentSeason}`, JSON.stringify(sentenceCorrectStatus));
+                        localStorage.removeItem(`usedSeason${currentSeason - 1}`);
+                        showNote(`🎊 সিজন ${currentSeason} আনলক হয়েছে!`, 3000, "blue");
+                    } else {
+                        showNote("🎊 সব সিজন সম্পন্ন! অভিনন্দন!", 3000, "green");
+                    }
+                }
+            }
+        } else {
+            showNote("উচ্চারণ আবার চেষ্টা করো", 2000, "red");
+        }
+        
+        displayProgress();
+    }
+
+    // Display History
+    function displayHistory() {
+        if (history.length === 0) {
+            historyBox.innerHTML = "<div class='history-header'><span>ইতিহাস:</span><span class='clear-history' onclick='clearHistory()'>❌</span></div><p>কোন ভুল নেই</p>";
+            return;
+        }
+        
+        let historyHTML = "<div class='history-header'><span>ইতিহাস:</span><span class='clear-history' onclick='clearHistory()'>❌</span></div>";
+        history.forEach(item => {
+            historyHTML += `<p><span class='wrong'>${item.wrong}</span> → <span class='correct'>${item.right}</span></p>`;
+        });
+        historyBox.innerHTML = historyHTML;
+    }
+
+    // Clear History
+    function clearHistory() {
+        history = [];
+        localStorage.setItem("history", JSON.stringify(history));
+        displayHistory();
+    }
+
+    // Next button
+    nextBtn.addEventListener("click", () => {
+        loadSentence();
+    });
+
+    // Try again button
+    tryBtn.addEventListener("click", () => {
+        const s = seasons[currentSeason][currentStep];
+        engText.innerHTML = s.en;
+        bnText.innerText = s.bn;
+        userSpokenText.innerText = "";
+        note.style.display = "none";
+    });
+
+    // Restart season button
+    restartBtn.addEventListener("click", () => {
+        if (confirm("পুরো সিজন আবার শুরু করতে চাও?")) {
+            sentenceCorrectStatus = [false, false, false, false, false];
+            correctInSeries = 0;
+            localStorage.setItem(`correctInSeason${currentSeason}`, 0);
+            localStorage.setItem(`statusSeason${currentSeason}`, JSON.stringify(sentenceCorrectStatus));
+            localStorage.removeItem(`usedSeason${currentSeason}`);
+            loadSentence();
+            showNote("সিজন রিস্টার্ট করা হয়েছে", 2000, "blue");
+        }
+    });
+
+    // Initialize
+    displayHistory();
+</script>
+</body>
+</html>
